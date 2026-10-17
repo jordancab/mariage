@@ -593,15 +593,23 @@
   .epilogue-points span.actif { background: #fff; transform: scale(1.3); }
 
 
-  /* ---------- MUSIQUE (lecteur Spotify) ---------- */
-  .musique { position: fixed; right: calc(14px + env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 40; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-  .musique-bouton { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--ligne); background: rgba(255,255,255,0.94); color: var(--olive-fonce); font-size: 22px; line-height: 1; cursor: pointer; box-shadow: 0 6px 18px rgba(30,25,15,0.2); display: flex; align-items: center; justify-content: center; font-family: inherit; }
+
+
+  /* ---------- MUSIQUE + ÉCRAN D'ACCUEIL ---------- */
+  .musique-bouton { position: fixed; right: calc(14px + env(safe-area-inset-right)); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 40; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--ligne); background: rgba(255,255,255,0.94); color: var(--olive-fonce); font-size: 22px; line-height: 1; cursor: pointer; box-shadow: 0 6px 18px rgba(30,25,15,0.2); display: flex; align-items: center; justify-content: center; font-family: inherit; padding: 0; }
   .musique-bouton:hover { background: #fff; }
-  .musique-bouton.ouvert { background: var(--olive); color: #fff; border-color: var(--olive); }
-  .musique-panneau { width: min(340px, calc(100vw - 28px)); border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 12px 32px rgba(30,25,15,0.28); border: 1px solid var(--ligne); }
-  .musique-panneau[hidden] { display: none; }
-  .musique-panneau p { margin: 0; padding: 8px 12px 0; font-size: 11.5px; color: var(--encre-douce); text-align: center; }
-  .musique-panneau iframe { display: block; width: 100%; height: 80px; border: 0; }
+  .musique-bouton.coupee { color: var(--encre-douce); }
+  .musique-bouton.coupee::after { content: ""; position: absolute; width: 26px; height: 2px; background: var(--encre-douce); transform: rotate(-45deg); border-radius: 2px; }
+  .musique-bouton[hidden] { display: none; }
+  .accueil-ecran { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 32px 24px calc(32px + env(safe-area-inset-bottom)); text-align: center; background: linear-gradient(160deg, #FBF3EC 0%, #F1E3D3 100%); color: var(--encre); transition: opacity 0.7s ease, visibility 0.7s ease; }
+  .accueil-ecran.parti { opacity: 0; visibility: hidden; pointer-events: none; }
+  .accueil-ecran .ae-sur { font-family: 'Jost', sans-serif; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--or); margin: 0 0 18px; }
+  .accueil-ecran .ae-noms { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 46px; line-height: 1.1; margin: 0 0 14px; color: var(--encre); text-wrap: balance; }
+  .accueil-ecran .ae-sous { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; color: var(--encre-douce); margin: 0 0 40px; }
+  .accueil-ecran .ae-ouvrir { padding: 16px 34px; border: none; border-radius: 30px; background: var(--olive); color: #fff; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; min-height: 48px; box-shadow: 0 10px 24px rgba(138,138,94,0.35); }
+  .accueil-ecran .ae-ouvrir:hover { background: var(--olive-fonce); }
+  .accueil-ecran .ae-silence { margin-top: 18px; background: none; border: none; font-family: 'Jost', sans-serif; font-size: 12.5px; color: var(--encre-douce); text-decoration: underline; cursor: pointer; padding: 10px; }
+  @media (min-width: 900px) { .accueil-ecran .ae-noms { font-size: 72px; } .accueil-ecran .ae-sous { font-size: 24px; } }
 
   /* Accessibilité : respecte « réduire les animations » (iOS, Android, ordinateur) */
   @media (prefers-reduced-motion: reduce) {
@@ -931,15 +939,16 @@
   </div>
 </div>
 
-<!-- ===================== MUSIQUE ===================== -->
-<div class="musique" id="musique">
-  <div class="musique-panneau" id="musique-panneau" hidden>
-    <p>Appuyez sur ▶ pour lancer la musique</p>
-    <div id="musique-lecteur"></div>
-  </div>
-  <button type="button" class="musique-bouton" id="musique-bouton" aria-expanded="false" aria-controls="musique-panneau" aria-label="Musique" title="Musique">♪</button>
+<!-- ===================== ÉCRAN D'ACCUEIL + MUSIQUE ===================== -->
+<div class="accueil-ecran" id="accueil-ecran" role="dialog" aria-modal="true" aria-labelledby="ae-titre">
+  <p class="ae-sur">Invitation</p>
+  <h1 class="ae-noms" id="ae-titre">Lionelle &amp; Aurel</h1>
+  <p class="ae-sous">vous invitent à célébrer leur union</p>
+  <button type="button" class="ae-ouvrir" id="ae-ouvrir">Ouvrir l'invitation ♪</button>
+  <button type="button" class="ae-silence" id="ae-silence">Entrer sans musique</button>
 </div>
-
+<audio id="musique-audio" src="musique.mp3" loop preload="auto"></audio>
+<button type="button" class="musique-bouton" id="musique-bouton" hidden aria-pressed="true" aria-label="Couper la musique" title="Musique">♪</button>
 <script>
   /* Adresse du service qui enregistre les réponses (Google Apps Script, voir LISEZMOI.md).
      À remplacer par l'adresse « …/exec » obtenue lors du déploiement. */
@@ -1043,26 +1052,50 @@
     }, 4000);
   })();
 
-  /* ---- Musique : lecteur Spotify (chargé seulement à la première ouverture) ---- */
+  /* ---- Écran d'accueil + musique (le son démarre au premier appui, comme l'exigent les navigateurs) ---- */
   (function initMusique() {
+    const ecran = document.getElementById('accueil-ecran');
+    const audio = document.getElementById('musique-audio');
     const bouton = document.getElementById('musique-bouton');
-    const panneau = document.getElementById('musique-panneau');
-    const zone = document.getElementById('musique-lecteur');
-    if (!bouton || !panneau || !zone) return;
-    bouton.addEventListener('click', function() {
-      const ouvrir = panneau.hidden;
-      if (ouvrir && !zone.firstChild) {
-        const f = document.createElement('iframe');
-        f.src = 'https://open.spotify.com/embed/track/7m9WM0heHpmLZhwgHHXONZ?utm_source=generator&theme=0';
-        f.title = 'Musique du mariage (Spotify)';
-        f.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-        f.loading = 'lazy';
-        zone.appendChild(f);
-      }
-      panneau.hidden = !ouvrir;
-      bouton.classList.toggle('ouvert', ouvrir);
-      bouton.setAttribute('aria-expanded', ouvrir ? 'true' : 'false');
+    if (!ecran || !audio || !bouton) return;
+    const VOLUME = 0.45;
+    let veut = false;           // l'invité souhaite la musique
+    let fondu = null;
+
+    function majBouton() {
+      bouton.classList.toggle('coupee', !veut);
+      bouton.setAttribute('aria-pressed', veut ? 'true' : 'false');
+      bouton.setAttribute('aria-label', veut ? 'Couper la musique' : 'Lancer la musique');
+    }
+    function lancer() {
+      veut = true; audio.volume = 0;
+      const p = audio.play();
+      if (p && p.catch) p.catch(function() { veut = false; majBouton(); });
+      clearInterval(fondu);
+      fondu = setInterval(function() {
+        if (audio.volume < VOLUME - 0.03) audio.volume = Math.min(VOLUME, audio.volume + 0.03);
+        else { audio.volume = VOLUME; clearInterval(fondu); }
+      }, 90);
+      majBouton();
+    }
+    function couper() { veut = false; clearInterval(fondu); audio.pause(); majBouton(); }
+    function entrer(avecMusique) {
+      ecran.classList.add('parti');
+      document.documentElement.style.overflow = '';
+      bouton.hidden = false;
+      if (avecMusique) lancer(); else majBouton();
+      setTimeout(function() { ecran.style.display = 'none'; }, 800);
+    }
+    document.documentElement.style.overflow = 'hidden';
+    document.getElementById('ae-ouvrir').addEventListener('click', function() { entrer(true); });
+    document.getElementById('ae-silence').addEventListener('click', function() { entrer(false); });
+    bouton.addEventListener('click', function() { if (veut) couper(); else lancer(); });
+    // Pause quand l'onglet est caché, reprise au retour
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) audio.pause();
+      else if (veut) { const p = audio.play(); if (p && p.catch) p.catch(function() {}); }
     });
+    document.getElementById('ae-ouvrir').focus();
   })();
 
   function allerA(vue) {
@@ -1350,7 +1383,7 @@
         : m === 'introuvable' ? "Cet invité n'existe plus. Actualisez la liste."
         : m === 'donnees_invalides' ? 'Informations invalides.'
         : m === 'identifiants' || m === 'trop_de_tentatives' ? 'Session expirée : reconnectez-vous.'
-        : "L'opération a échoué. Vérifiez votre connexion et réessayez.";
+        : "L'opération a échoué. Vérifiez votre connexion et réessayez. (code : " + (m || 'inconnu') + ")";
       erreur.style.display = 'block';
       bouton.disabled = false;
     }
