@@ -554,13 +554,18 @@
   }
 
 
+
+  .std-titre { font-family: 'Jost', sans-serif; font-weight: 800; font-size: min(8.4vw, 64px); line-height: 1.1; letter-spacing: 0.14em; padding-left: 0.14em; white-space: nowrap; text-transform: uppercase; color: #B9812A; margin: 0 0 22px; }
   /* ---------- ALIGNEMENT : même départ en haut sur toutes les pages, sous la barre de navigation ---------- */
   .chapitre { padding-top: calc(92px + env(safe-area-inset-top)); padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
   .ch-histoire { justify-content: flex-start; }
   .chapitre-titre, .epilogue-citation, .histoire-p, .chapitre-texte { text-wrap: balance; }
   .histoire-p { text-wrap: pretty; text-align: center; margin-left: auto; margin-right: auto; }
   .chapitre-repere { min-height: 1.2em; }
-  .bouton-fin-histoire { margin-top: 34px; }
+  .bouton-epilogue { margin-top: 6px; }
+  @media (max-height: 620px) { .ch-epilogue { padding-top: 74px; padding-bottom: 20px; } .ch-epilogue .epilogue-citation { font-size: 17px; margin-bottom: 12px; line-height: 1.35; } .ch-epilogue .epilogue-signature { font-size: 22px; margin-bottom: 10px; } .ch-epilogue .chapitre-repere { margin-bottom: 8px; } .bouton-epilogue { min-height: 44px; padding-top: 10px; padding-bottom: 10px; } }
+  /* La photo de l'épilogue s'adapte à la hauteur de l'écran pour que le bouton reste visible */
+  .ch-epilogue .epilogue-photo { max-width: min(88vw, 540px, max(200px, calc((100vh - 470px) * 1.3333))); max-width: min(88vw, 540px, max(200px, calc((100dvh - 470px) * 1.3333))); }
   .polaroid, .epilogue-photo { margin-left: auto; margin-right: auto; }
   .polaroid { box-sizing: border-box; }
   .stats { grid-template-columns: repeat(5, 1fr); }
@@ -603,7 +608,7 @@
   .musique-bouton[hidden] { display: none; }
   .accueil-ecran { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 32px 24px calc(32px + env(safe-area-inset-bottom)); text-align: center; background: linear-gradient(160deg, #FBF3EC 0%, #F1E3D3 100%); color: var(--encre); transition: opacity 0.7s ease, visibility 0.7s ease; }
   .accueil-ecran.parti { opacity: 0; visibility: hidden; pointer-events: none; }
-  .accueil-ecran .ae-sur { font-family: 'Jost', sans-serif; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--or); margin: 0 0 18px; }
+  .accueil-ecran .ae-sur { font-family: 'Jost', sans-serif; font-weight: 800; font-size: min(8.4vw, 64px); line-height: 1.1; letter-spacing: 0.14em; white-space: nowrap; text-transform: uppercase; color: #B9812A; margin: 0 0 26px; padding-left: 0.14em; }
   .accueil-ecran .ae-noms { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; font-size: 46px; line-height: 1.1; margin: 0 0 14px; color: var(--encre); text-wrap: balance; }
   .accueil-ecran .ae-sous { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; color: var(--encre-douce); margin: 0 0 40px; }
   .accueil-ecran .ae-ouvrir { padding: 16px 34px; border: none; border-radius: 30px; background: var(--olive); color: #fff; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; min-height: 48px; box-shadow: 0 10px 24px rgba(138,138,94,0.35); }
@@ -726,7 +731,7 @@
         <path d="M118 90 Q112 70 120 54" stroke="var(--olive)"/>
       </g>
     </svg>
-    <p class="chapitre-repere" style="color: var(--or);">Save the date</p>
+    <p class="std-titre">Save the date</p>
     <h2 class="maries">Lionelle &amp; Aurel</h2>
     <p class="invite">vous invitent à célébrer leur union</p>
     <div class="capsules">
@@ -780,7 +785,6 @@
     <p class="chapitre-texte histoire-p">Et le 17 mai 2026, le jour de ses 30 ans, Aurel a posé un genou à terre. Une question, des larmes de joie… et un « oui » qui a changé nos vies.</p>
     <p class="chapitre-texte histoire-p">Aujourd'hui, nous avons le bonheur de vous inviter à écrire avec nous le plus beau chapitre de notre histoire.</p>
     <p class="histoire-signature">Lionelle &amp; Aurel</p>
-    <button class="bouton-pilule bouton-fin-histoire" onclick="allerA('formulaire')">Confirmer ma présence</button>
   </section>
 
 
@@ -799,6 +803,7 @@
       <div class="epilogue-points" id="epilogue-points"></div>
     </div>
     <p class="epilogue-signature">Lionelle &amp; Aurel</p>
+    <button class="bouton-pilule bouton-epilogue" onclick="allerA('formulaire')">Confirmer ma présence</button>
   </section>
 
 </div>
@@ -941,7 +946,7 @@
 
 <!-- ===================== ÉCRAN D'ACCUEIL + MUSIQUE ===================== -->
 <div class="accueil-ecran" id="accueil-ecran" role="dialog" aria-modal="true" aria-labelledby="ae-titre">
-  <p class="ae-sur">Invitation</p>
+  <p class="ae-sur">Save the date</p>
   <h1 class="ae-noms" id="ae-titre">Lionelle &amp; Aurel</h1>
   <p class="ae-sous">vous invitent à célébrer leur union</p>
   <button type="button" class="ae-ouvrir" id="ae-ouvrir">Ouvrir l'invitation ♪</button>
