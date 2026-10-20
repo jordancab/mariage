@@ -389,8 +389,6 @@
   .toggle button.actif.non { background: var(--encre); border-color: var(--encre); color: #fff; }
   .toggle.neutre button.actif.oui { background: var(--olive); border-color: var(--olive); color: #fff; }
   .groupe-rep { margin-bottom: 22px; }
-  .bloc-enfants { display: none; margin-top: 14px; }
-  .bloc-enfants.visible { display: block; }
   input[type="number"] {
     width: 100%; padding: 11px 2px; border: none; border-bottom: 1.5px solid var(--ligne);
     background: transparent; font-family: 'Jost', sans-serif; font-size: 16px;
@@ -568,7 +566,7 @@
   .ch-epilogue .epilogue-photo { max-width: min(88vw, 540px, max(200px, calc((100vh - 470px) * 1.3333))); max-width: min(88vw, 540px, max(200px, calc((100dvh - 470px) * 1.3333))); }
   .polaroid, .epilogue-photo { margin-left: auto; margin-right: auto; }
   .polaroid { box-sizing: border-box; }
-  .stats { grid-template-columns: repeat(5, 1fr); }
+  .stats { grid-template-columns: repeat(3, 1fr); }
   @media (max-width: 700px) { .stats { grid-template-columns: 1fr 1fr; } .stats .stat-carte:last-child:nth-child(odd) { grid-column: 1 / -1; } }
   @media (max-width: 560px) { .polaroid { width: min(100%, 440px); } }
   @media (max-width: 560px) {
@@ -866,28 +864,6 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend>Votre venue</legend>
-        <div class="groupe-rep">
-          <p class="reponse-label">Serez-vous accompagné(e) ? <span class="oblig">*</span></p>
-          <div class="toggle neutre" data-event="accompagne">
-            <button type="button" data-val="oui">Oui</button>
-            <button type="button" data-val="non">Non</button>
-          </div>
-        </div>
-        <div class="groupe-rep">
-          <p class="reponse-label">Venez-vous avec des enfants ? <span class="oblig">*</span></p>
-          <div class="toggle neutre" data-event="enfants">
-            <button type="button" data-val="oui">Oui</button>
-            <button type="button" data-val="non">Non</button>
-          </div>
-          <div class="bloc-enfants" id="bloc-enfants">
-            <label class="champ" for="nb-enfants">Combien d'enfants ? <span class="oblig">*</span></label>
-            <input type="number" id="nb-enfants" min="1" max="15" step="1" inputmode="numeric" placeholder="Ex : 2">
-          </div>
-        </div>
-      </fieldset>
-
       <input type="text" id="piege" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
       <p class="erreur" id="erreur">Tous les champs sont obligatoires : merci de les remplir et de répondre à chaque question.</p>
       <button type="submit" class="bouton-principal" id="btnEnvoyer">Confirmer ma présence</button>
@@ -928,8 +904,6 @@
         <div class="stat-carte"><div class="valeur" id="stat-total">0</div><div class="label">Réponses</div></div>
         <div class="stat-carte"><div class="valeur" id="stat-cameroun">0</div><div class="label">Présents · Yaoundé</div></div>
         <div class="stat-carte"><div class="valeur" id="stat-france">0</div><div class="label">Présents · Paris</div></div>
-        <div class="stat-carte"><div class="valeur" id="stat-accompagnes">0</div><div class="label">Accompagnés</div></div>
-        <div class="stat-carte"><div class="valeur" id="stat-enfants">0</div><div class="label">Enfants (total)</div></div>
       </div>
 
       <div class="barre-admin">
@@ -1116,7 +1090,7 @@
   }
 
   /* ---- Formulaire de confirmation ---- */
-  const reponses = { cameroun: null, france: null, accompagne: null, enfants: null };
+  const reponses = { cameroun: null, france: null };
 
   document.querySelectorAll('.toggle').forEach(function(groupe) {
     const event = groupe.dataset.event;
@@ -1125,7 +1099,6 @@
         groupe.querySelectorAll('button').forEach(function(b) { b.classList.remove('actif', 'oui', 'non'); });
         btn.classList.add('actif', btn.dataset.val);
         reponses[event] = btn.dataset.val;
-        if (event === 'enfants') document.getElementById('bloc-enfants').classList.toggle('visible', btn.dataset.val === 'oui');
       });
     });
   });
@@ -1139,20 +1112,15 @@
     const erreur = document.getElementById('erreur');
     const msgManque = 'Tous les champs sont obligatoires : merci de les remplir et de répondre à chaque question.';
 
-    const nbBrut = document.getElementById('nb-enfants').value.trim();
-    const nbEnf = reponses.enfants === 'oui' ? parseInt(nbBrut, 10) : 0;
-    const nbValide = reponses.enfants === 'non' || (/^\d+$/.test(nbBrut) && nbEnf >= 1 && nbEnf <= 15);
-    if (!nom || !prenom || !reponses.cameroun || !reponses.france || !reponses.accompagne || !reponses.enfants || !nbValide) {
-      const seulNbManque = nom && prenom && reponses.cameroun && reponses.france && reponses.accompagne && reponses.enfants === 'oui' && !nbValide;
-      erreur.textContent = seulNbManque ? "Merci de remplir le nombre d'enfants (de 1 à 15)." : msgManque;
+    if (!nom || !prenom || !reponses.cameroun || !reponses.france) {
+      erreur.textContent = msgManque;
       document.querySelectorAll('.manquant').forEach(function(x) { x.classList.remove('manquant'); });
       const manquants = [];
       if (!nom) manquants.push(document.getElementById('nom'));
       if (!prenom) manquants.push(document.getElementById('prenom'));
-      ['cameroun', 'france', 'accompagne', 'enfants'].forEach(function(k) {
+      ['cameroun', 'france'].forEach(function(k) {
         if (!reponses[k]) manquants.push(document.querySelector('.toggle[data-event="' + k + '"]'));
       });
-      if (reponses.enfants === 'oui' && !nbValide) manquants.push(document.getElementById('nb-enfants'));
       manquants.forEach(function(x) { x.classList.add('manquant'); });
       erreur.style.display = 'block';
       clearTimeout(window.__minuteurErreur);
@@ -1176,8 +1144,6 @@
         prenom: prenom,
         cameroun: reponses.cameroun,
         france: reponses.france,
-        accompagne: reponses.accompagne,
-        enfants: nbEnf,
         piege: document.getElementById('piege').value
       });
       if (!res || !res.ok) throw new Error((res && res.error) || 'echec');
@@ -1186,9 +1152,7 @@
       document.getElementById('recap').innerHTML =
         '<div><span>Nom</span><span>' + echapper(nom + ' ' + prenom) + '</span></div>' +
         '<div><span>Yaoundé, 15 mai 2027</span><span>' + (reponses.cameroun === 'oui' ? 'Présent(e)' : 'Absent(e)') + '</span></div>' +
-        '<div><span>Paris, 21 août 2027</span><span>' + (reponses.france === 'oui' ? 'Présent(e)' : 'Absent(e)') + '</span></div>' +
-        '<div><span>Accompagné(e)</span><span>' + (reponses.accompagne === 'oui' ? 'Oui' : 'Non') + '</span></div>' +
-        '<div><span>Enfants</span><span>' + (nbEnf > 0 ? nbEnf : 'Aucun') + '</span></div>';
+        '<div><span>Paris, 21 août 2027</span><span>' + (reponses.france === 'oui' ? 'Présent(e)' : 'Absent(e)') + '</span></div>';
       document.getElementById('confirmation').style.display = 'block';
       window.scrollTo(0, 0);
     } catch (err) {
@@ -1247,8 +1211,6 @@
       document.getElementById('stat-total').textContent = entrees.length;
       document.getElementById('stat-cameroun').textContent = entrees.filter(function(x) { return x.cameroun === 'oui'; }).length;
       document.getElementById('stat-france').textContent = entrees.filter(function(x) { return x.france === 'oui'; }).length;
-      document.getElementById('stat-accompagnes').textContent = entrees.filter(function(x) { return x.accompagne === 'oui'; }).length;
-      document.getElementById('stat-enfants').textContent = entrees.reduce(function(t, x) { return t + (parseInt(x.enfants, 10) || 0); }, 0);
 
       if (entrees.length === 0) {
         contenu.innerHTML = '<p class="vide">Aucune réponse enregistrée pour le moment.</p>';
@@ -1267,14 +1229,12 @@
             '<button type="button" class="suppr" data-act="del" data-i="' + i + '">Supprimer</button></div></td>' +
           '<td><span class="puce ' + c + '">' + (c === 'oui' ? 'Présent' : 'Absent') + '</span></td>' +
           '<td><span class="puce ' + f + '">' + (f === 'oui' ? 'Présent' : 'Absent') + '</span></td>' +
-          '<td>' + (x.accompagne === 'oui' ? 'Oui' : 'Non') + '</td>' +
-          '<td>' + ((parseInt(x.enfants, 10) || 0) > 0 ? echapper(String(parseInt(x.enfants, 10))) : 'Non') + '</td>' +
           '<td>' + echapper(date) + '</td>' +
         '</tr>';
       });
 
       contenu.innerHTML = '<table class="donnees"><thead><tr>' +
-        '<th>Invité</th><th>Yaoundé</th><th>Paris</th><th>Accompagné(e)</th><th>Enfants</th><th>Soumis le</th>' +
+        '<th>Invité</th><th>Yaoundé</th><th>Paris</th><th>Soumis le</th>' +
         '</tr></thead><tbody>' + lignes + '</tbody></table>';
       return true;
     } catch (err) {
@@ -1324,15 +1284,13 @@
       bouton.textContent = 'Supprimer';
       bouton.classList.add('bouton-danger');
     } else {
-      const v = inv || { nom: '', prenom: '', cameroun: 'oui', france: 'oui', accompagne: 'non', enfants: 0 };
+      const v = inv || { nom: '', prenom: '', cameroun: 'oui', france: 'oui' };
       titre.textContent = mode === 'add' ? 'Ajouter un invité' : "Modifier l'invité";
       corps.innerHTML =
         '<label class="champ" for="m-nom">Nom</label><input type="text" id="m-nom" maxlength="80" autocomplete="off" value="' + echapper(v.nom) + '">' +
         '<label class="champ" for="m-prenom">Prénom(s)</label><input type="text" id="m-prenom" maxlength="80" autocomplete="off" value="' + echapper(v.prenom) + '">' +
         '<label class="champ" for="m-cameroun">Yaoundé · 15 mai 2027</label><select id="m-cameroun">' + optionsReponse(v.cameroun) + '</select>' +
-        '<label class="champ" for="m-france">Paris · 21 août 2027</label><select id="m-france">' + optionsReponse(v.france) + '</select>' +
-        '<label class="champ" for="m-accompagne">Accompagné(e) ?</label><select id="m-accompagne"><option value="non"' + (v.accompagne !== 'oui' ? ' selected' : '') + '>Non</option><option value="oui"' + (v.accompagne === 'oui' ? ' selected' : '') + '>Oui</option></select>' +
-        '<label class="champ" for="m-enfants">Nombre d\'enfants (0 si aucun)</label><input type="number" id="m-enfants" min="0" max="15" step="1" inputmode="numeric" value="' + (parseInt(v.enfants, 10) || 0) + '">';
+        '<label class="champ" for="m-france">Paris · 21 août 2027</label><select id="m-france">' + optionsReponse(v.france) + '</select>';
       bouton.textContent = 'Enregistrer';
     }
     document.getElementById('modale').hidden = false;
@@ -1365,11 +1323,8 @@
       corps.prenom = document.getElementById('m-prenom').value.trim();
       corps.cameroun = document.getElementById('m-cameroun').value;
       corps.france = document.getElementById('m-france').value;
-      corps.accompagne = document.getElementById('m-accompagne').value;
-      const nbBrut = document.getElementById('m-enfants').value.trim();
-      corps.enfants = /^\d+$/.test(nbBrut) ? parseInt(nbBrut, 10) : -1;
-      if (!corps.nom || !corps.prenom || corps.enfants < 0 || corps.enfants > 15) {
-        erreur.textContent = 'Tous les champs sont obligatoires (nombre d\'enfants : 0 à 15).';
+      if (!corps.nom || !corps.prenom) {
+        erreur.textContent = 'Tous les champs sont obligatoires.';
         erreur.style.display = 'block';
         return;
       }
@@ -1403,9 +1358,9 @@
 
   function exporterCSV() {
     if (!dernieresDonnees.length) return;
-    let csv = 'Nom;Prenom;Yaounde;Paris;Accompagne;Enfants;Soumis le\n';
+    let csv = 'Nom;Prenom;Yaounde;Paris;Soumis le\n';
     dernieresDonnees.forEach(function(x) {
-      csv += [x.nom, x.prenom, x.cameroun, x.france, x.accompagne, x.enfants, x.soumisLe].map(celluleCSV).join(';') + '\n';
+      csv += [x.nom, x.prenom, x.cameroun, x.france, x.soumisLe].map(celluleCSV).join(';') + '\n';
     });
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
